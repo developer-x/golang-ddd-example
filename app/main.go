@@ -17,7 +17,7 @@ func main() {
 	accountRepo := domain.NewAccountRepository(sqliteDB)
 	accountService := account.NewAccountService(accountRepo)
 	accountController := account.NewController(accountService)
-	api.GET("account", accountController.GetAccount)
+	api.GET("accounts/:id", accountController.GetAccount)
 	err := engine.Run(":8080")
 	if err != nil {
 		log.Fatal("Starting server failed", err)

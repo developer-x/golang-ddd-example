@@ -5,9 +5,9 @@ type AccountState struct {
 }
 
 type Account interface {
-	GetName() string
+	Rename(name string)
 }
 
-func (a *AccountState) GetName() string {
-	return a.Name
+func (a *AccountState) Rename(name string) {
+	a.Name = name
 }

@@ -3,6 +3,7 @@ package account
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type AccountControllerState struct {
@@ -20,6 +21,12 @@ func NewController(service AccountService) AccountController {
 }
 
 func (c *AccountControllerState) GetAccount(ctx *gin.Context) {
-	result := c.service.GetAccount()
+	idParm := ctx.Param("id")
+	id, err := strconv.Atoi(idParm)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	result := c.service.GetAccount(id)
 	ctx.JSON(http.StatusOK, gin.H{"response": result})
 }

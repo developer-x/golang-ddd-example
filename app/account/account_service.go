@@ -7,13 +7,13 @@ type AccountServiceState struct {
 }
 
 type AccountService interface {
-	GetAccount() domain.Account
+	GetAccount(id int) domain.Account
 }
 
 func NewAccountService(repo domain.AccountRepository) AccountService {
 	return &AccountServiceState{Repo: repo}
 }
 
-func (a *AccountServiceState) GetAccount() domain.Account {
-	return a.Repo.FindById(1)
+func (a *AccountServiceState) GetAccount(id int) domain.Account {
+	return a.Repo.FindById(id)
 }
