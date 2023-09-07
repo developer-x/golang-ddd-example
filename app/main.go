@@ -13,6 +13,7 @@ func main() {
 	engine := gin.Default()
 	api := engine.Group("/api")
 	sqliteDB := sqlx.MustOpen("sqlite3", ":memory:")
+	sqliteDB.MustExec(`CREATE TABLE accounts (id INT PRIMARY KEY);`)
 
 	accountRepo := domain.NewAccountRepository(sqliteDB)
 	accountService := account.NewAccountService(accountRepo)
