@@ -1,13 +1,17 @@
 package domain
 
 type AccountState struct {
-	Name string `json:"name"`
+	name string
 }
 
 type Account interface {
 	Rename(name string)
 }
 
+func NewAccount() Account {
+	return nil
+}
+
 func (a *AccountState) Rename(name string) {
-	a.Name = name
+	a.name = name
 }

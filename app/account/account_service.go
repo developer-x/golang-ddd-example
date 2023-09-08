@@ -3,17 +3,23 @@ package account
 import "example.com/greetings/app/account/domain"
 
 type AccountServiceState struct {
-	Repo domain.AccountRepository
+	repo domain.AccountRepository
 }
 
 type AccountService interface {
-	GetAccount(id int) domain.Account
+	CreateAccount(request AccountCreateRequest) AccountView
+	GetAccount(id int) AccountView
 }
 
 func NewAccountService(repo domain.AccountRepository) AccountService {
-	return &AccountServiceState{Repo: repo}
+	return &AccountServiceState{repo: repo}
 }
 
-func (a *AccountServiceState) GetAccount(id int) domain.Account {
-	return a.Repo.FindById(id)
+func (a *AccountServiceState) CreateAccount(request AccountCreateRequest) AccountView {
+	return AccountView{}
+}
+
+func (a *AccountServiceState) GetAccount(id int) AccountView {
+	//return a.repo.FindById(id)
+	return AccountView{}
 }
