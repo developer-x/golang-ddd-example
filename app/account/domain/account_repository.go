@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/jmoiron/sqlx"
+import (
+	"context"
+	"github.com/jmoiron/sqlx"
+)
 
 type AccountRepositoryState struct {
 	db *sqlx.DB
@@ -11,18 +14,18 @@ type DatabaseAccountState struct {
 }
 
 type AccountRepository interface {
-	FindById(id int) Account
-	Save(account Account) Account
+	FindById(ctx context.Context, id int) (Account, error)
+	Save(ctx context.Context, account Account) (Account, error)
 }
 
 func NewAccountRepository(db *sqlx.DB) AccountRepository {
 	return &AccountRepositoryState{db: db}
 }
 
-func (cfg *AccountRepositoryState) FindById(id int) Account {
-	return &AccountState{name: "foobar"}
+func (cfg *AccountRepositoryState) FindById(ctx context.Context, id int) (Account, error) {
+	return &AccountState{name: "name"}, nil
 }
 
-func (cfg *AccountRepositoryState) Save(account Account) Account {
-	return nil
+func (cfg *AccountRepositoryState) Save(ctx context.Context, account Account) (Account, error) {
+	return &AccountState{name: "name"}, nil
 }
