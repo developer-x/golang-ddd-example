@@ -1,4 +1,4 @@
-package account
+package domain
 
 type AccountCreateRequest struct {
 	Name string

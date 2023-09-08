@@ -13,12 +13,13 @@ func main() {
 	engine := gin.Default()
 	api := engine.Group("/api")
 	sqliteDB := sqlx.MustOpen("sqlite3", ":memory:")
-	sqliteDB.MustExec(`CREATE TABLE accounts (id INT PRIMARY KEY);`)
+	sqliteDB.MustExec(`CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT);`)
 
 	accountRepo := domain.NewAccountRepository(sqliteDB)
 	accountService := account.NewAccountService(accountRepo)
 	accountController := account.NewController(accountService)
 	api.GET("accounts/:id", accountController.GetAccount)
+	api.POST("accounts", accountController.CreateAccount)
 	err := engine.Run(":8080")
 	if err != nil {
 		log.Fatal("Starting server failed", err)

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"example.com/greetings/app/account/domain"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -28,16 +29,24 @@ func (c *AccountControllerState) GetAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, nil)
 		return
 	}
-	result := c.service.GetAccount(id)
+	result, err := c.service.GetAccount(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{"response": result})
 }
 
 func (c *AccountControllerState) CreateAccount(ctx *gin.Context) {
-	accountCreateRequest := AccountCreateRequest{}
+	accountCreateRequest := domain.AccountCreateRequest{}
 	if err := ctx.ShouldBindJSON(&accountCreateRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing request"})
 		return
 	}
-	result := c.service.CreateAccount(accountCreateRequest)
+	result, err := c.service.CreateAccount(ctx, accountCreateRequest)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{"response": result})
 }
