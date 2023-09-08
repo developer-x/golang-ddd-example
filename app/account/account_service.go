@@ -11,8 +11,8 @@ type AccountServiceState struct {
 
 type AccountService interface {
 	CreateAccount(ctx context.Context, request domain.AccountCreateRequest) (AccountView, error)
-	RenameAccount(ctx context.Context, id int, name string) (AccountView, error)
 	GetAccount(ctx context.Context, id int) (AccountView, error)
+	RenameAccount(ctx context.Context, id int, name string) (AccountView, error)
 }
 
 func NewAccountService(repo domain.AccountRepository) AccountService {
