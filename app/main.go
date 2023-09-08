@@ -20,6 +20,7 @@ func main() {
 	accountController := account.NewController(accountService)
 	api.GET("accounts/:id", accountController.GetAccount)
 	api.POST("accounts", accountController.CreateAccount)
+	api.PATCH("accounts/:id/name", accountController.RenameAccount)
 	err := engine.Run(":8080")
 	if err != nil {
 		log.Fatal("Starting server failed", err)

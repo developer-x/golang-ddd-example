@@ -11,6 +11,7 @@ type AccountServiceState struct {
 
 type AccountService interface {
 	CreateAccount(ctx context.Context, request domain.AccountCreateRequest) (AccountView, error)
+	RenameAccount(ctx context.Context, id int, name string) (AccountView, error)
 	GetAccount(ctx context.Context, id int) (AccountView, error)
 }
 
@@ -33,4 +34,17 @@ func (a *AccountServiceState) GetAccount(ctx context.Context, id int) (AccountVi
 		return AccountView{}, err
 	}
 	return AccountViewFrom(foundAccount), nil
+}
+
+func (a *AccountServiceState) RenameAccount(ctx context.Context, id int, name string) (AccountView, error) {
+	foundAccount, err := a.repo.FindById(ctx, id)
+	if err != nil {
+		return AccountView{}, err
+	}
+	foundAccount.Rename(name)
+	savedAccount, err := a.repo.Save(ctx, foundAccount)
+	if err != nil {
+		return AccountView{}, err
+	}
+	return AccountViewFrom(savedAccount), nil
 }
