@@ -2,6 +2,7 @@ package account
 
 import (
 	"example.com/greetings/app/account/domain"
+	"example.com/greetings/app/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -15,6 +16,7 @@ type AccountController interface {
 	GetAccount(ctx *gin.Context)
 	CreateAccount(ctx *gin.Context)
 	RenameAccount(ctx *gin.Context)
+	GetLoanApplications(ctx *gin.Context)
 }
 
 func NewController(service AccountService) AccountController {
@@ -52,6 +54,10 @@ func (c *AccountControllerState) CreateAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"response": result})
 }
 
+type RenameCommand struct {
+	Name string `json:"name"`
+}
+
 func (c *AccountControllerState) RenameAccount(ctx *gin.Context) {
 	idParm := ctx.Param("id")
 	id, err := strconv.Atoi(idParm)
@@ -59,17 +65,32 @@ func (c *AccountControllerState) RenameAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, nil)
 		return
 	}
-	body := gin.H{}
-	if err := ctx.ShouldBindJSON(&body); err != nil {
+	renameCommand := RenameCommand{}
+	if err := ctx.ShouldBindJSON(&renameCommand); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing request"})
 		return
 	}
-	name, ok := body["name"].(string)
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Error parsing request"})
+	result, err := c.service.RenameAccount(ctx, id, renameCommand.Name)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
 		return
 	}
-	result, err := c.service.RenameAccount(ctx, id, name)
+	ctx.JSON(http.StatusOK, gin.H{"response": result})
+}
+
+func (c *AccountControllerState) GetLoanApplications(ctx *gin.Context) {
+	idParm := ctx.Param("id")
+	id, err := strconv.Atoi(idParm)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	pageRequest := utils.PageRequest{}
+	if err := ctx.BindQuery(&pageRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	result, err := c.service.GetLoanApplicationsForAccount(ctx, id, pageRequest)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, nil)
 		return
