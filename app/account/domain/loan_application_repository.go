@@ -18,7 +18,10 @@ type DatabaseLoanApplicationState struct {
 }
 
 type LoanApplicationRepository interface {
-	FindById(ctx context.Context, id int) (LoanApplication, error)
+	FindByAccountAndLoanId(
+		ctx context.Context,
+		account AccountReference,
+		loanId int) (LoanApplication, error)
 	FindAllByAccount(
 		ctx context.Context,
 		account AccountReference,
@@ -31,13 +34,18 @@ func NewLoanApplicationRepository(db *sqlx.DB) LoanApplicationRepository {
 	return &LoanApplicationRepositoryState{db: db}
 }
 
-func (cfg *LoanApplicationRepositoryState) FindById(ctx context.Context, id int) (LoanApplication, error) {
+func (cfg *LoanApplicationRepositoryState) FindByAccountAndLoanId(
+	ctx context.Context,
+	account AccountReference,
+	loanId int,
+) (LoanApplication, error) {
 	loanApplicationState := DatabaseLoanApplicationState{}
 	if err := cfg.db.GetContext(
 		ctx,
 		&loanApplicationState,
-		"SELECT id, status, account_fk FROM loan_applications WHERE id=?;",
-		id,
+		"SELECT id, status, account_fk FROM loan_applications WHERE account_fk=? and id=?;",
+		account,
+		loanId,
 	); err != nil {
 		return &LoanApplicationState{}, err
 	}

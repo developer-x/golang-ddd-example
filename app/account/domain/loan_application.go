@@ -17,6 +17,14 @@ type LoanApplication interface {
 	Reject()
 }
 
+func NewLoanApplication(accountReference AccountReference) LoanApplication {
+	return &LoanApplicationState{
+		id:      -1,
+		status:  "pending",
+		account: accountReference,
+	}
+}
+
 func (las *LoanApplicationState) ID() int {
 	return las.id
 }

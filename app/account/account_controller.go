@@ -16,6 +16,8 @@ type AccountController interface {
 	GetAccount(ctx *gin.Context)
 	CreateAccount(ctx *gin.Context)
 	RenameAccount(ctx *gin.Context)
+	ApplyForALoan(ctx *gin.Context)
+	ApproveLoan(ctx *gin.Context)
 	GetLoanApplications(ctx *gin.Context)
 }
 
@@ -71,6 +73,42 @@ func (c *AccountControllerState) RenameAccount(ctx *gin.Context) {
 		return
 	}
 	result, err := c.service.RenameAccount(ctx, id, renameCommand.Name)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"response": result})
+}
+
+func (c *AccountControllerState) ApplyForALoan(ctx *gin.Context) {
+	idParm := ctx.Param("id")
+	id, err := strconv.Atoi(idParm)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	result, err := c.service.ApplyForALoan(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"response": result})
+}
+
+func (c *AccountControllerState) ApproveLoan(ctx *gin.Context) {
+	accountIdParm := ctx.Param("id")
+	accountId, err := strconv.Atoi(accountIdParm)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	loanIdParm := ctx.Param("loanId")
+	loanId, err := strconv.Atoi(loanIdParm)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	result, err := c.service.ApproveLoan(ctx, accountId, loanId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, nil)
 		return

@@ -20,6 +20,15 @@ type AccountService interface {
 		id int,
 		request utils.PageRequest,
 	) (utils.PageResponse[LoanApplicationView], error)
+	ApplyForALoan(
+		ctx context.Context,
+		id int,
+	) (LoanApplicationView, error)
+	ApproveLoan(
+		ctx context.Context,
+		accountId int,
+		loanId int,
+	) (LoanApplicationView, error)
 }
 
 func NewAccountService(
@@ -70,6 +79,47 @@ func (a *AccountServiceState) RenameAccount(
 		return AccountView{}, err
 	}
 	return AccountViewFrom(savedAccount), nil
+}
+
+func (a *AccountServiceState) ApplyForALoan(
+	ctx context.Context,
+	id int,
+) (LoanApplicationView, error) {
+	foundAccount, err := a.accountRepo.FindById(ctx, id)
+	if err != nil {
+		return LoanApplicationView{}, err
+	}
+	loanApplication := domain.NewLoanApplication(domain.AccountReference(foundAccount.ID()))
+	loanApplication, err = a.loanApplicationRepo.Save(ctx, loanApplication)
+	if err != nil {
+		return LoanApplicationView{}, err
+	}
+	return LoanApplicationViewFrom(loanApplication), nil
+}
+
+func (a *AccountServiceState) ApproveLoan(
+	ctx context.Context,
+	accountId int,
+	loanId int,
+) (LoanApplicationView, error) {
+	foundAccount, err := a.accountRepo.FindById(ctx, accountId)
+	if err != nil {
+		return LoanApplicationView{}, err
+	}
+	loanApplication, err := a.loanApplicationRepo.FindByAccountAndLoanId(
+		ctx,
+		domain.AccountReference(foundAccount.ID()),
+		loanId,
+	)
+	if err != nil {
+		return LoanApplicationView{}, err
+	}
+	loanApplication.Approve()
+	loanApplication, err = a.loanApplicationRepo.Save(ctx, loanApplication)
+	if err != nil {
+		return LoanApplicationView{}, err
+	}
+	return LoanApplicationViewFrom(loanApplication), nil
 }
 
 func (a *AccountServiceState) GetLoanApplicationsForAccount(

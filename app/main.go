@@ -23,6 +23,8 @@ func main() {
 	api.POST("accounts", accountController.CreateAccount)
 	api.GET("accounts/:id", accountController.GetAccount)
 	api.GET("accounts/:id/loan-applications", accountController.GetLoanApplications)
+	api.POST("accounts/:id/loan-applications", accountController.ApplyForALoan)
+	api.PATCH("accounts/:id/loan-applications/:loanId/approve", accountController.ApproveLoan)
 	api.PATCH("accounts/:id/name", accountController.RenameAccount)
 	err := engine.Run(":8080")
 	if err != nil {
